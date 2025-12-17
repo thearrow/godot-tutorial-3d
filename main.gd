@@ -5,13 +5,17 @@ extends Node
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	$UI/Retry.hide()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
 
+func _unhandled_input(event):
+	if event.is_action_pressed("accept") and $UI/Retry.visible:
+		# This restarts the current scene.
+		get_tree().reload_current_scene()
 
 func _on_mob_timer_timeout() -> void:
 	# Create a new instance of the Mob scene.
@@ -28,7 +32,10 @@ func _on_mob_timer_timeout() -> void:
 
 	# Spawn the mob by adding it to the Main scene.
 	add_child(mob)
-
+	
+	# We connect the mob to the score label to update the score upon squashing one.
+	mob.squashed.connect($UI/ScoreLabel._on_mob_squashed.bind())
 
 func _on_player_hit() -> void:
 	$MobTimer.stop()
+	$UI/Retry.show()
